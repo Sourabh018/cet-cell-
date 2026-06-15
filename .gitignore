@@ -16,7 +16,6 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 # Secrets
-backend/src/main/resources/application.yml
 backend/src/main/resources/application-prod.yml
 
 # Build output
