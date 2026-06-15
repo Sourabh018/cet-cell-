@@ -223,7 +223,7 @@ public class ExamService {
                     .id(attempt.getId())
                     .answers(attempt.getAnswers())
                     .markedForReview(attempt.getMarkedForReview())
-                    .startedAt(attempt.getStartedAt() != null ? attempt.getStartedAt().toString() : null)
+                    .startedAt(attempt.getStartedAt() != null ? attempt.getStartedAt().atZone(java.time.ZoneOffset.UTC).toInstant().toString() : null)
                     .lastSavedAt(attempt.getLastSavedAt() != null ? attempt.getLastSavedAt().toString() : null)
                     .status(attempt.getStatus().name())
                     .score(score)
