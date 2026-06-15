@@ -1,6 +1,8 @@
 spring:
-  application:
-    name: examprep-backend
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
