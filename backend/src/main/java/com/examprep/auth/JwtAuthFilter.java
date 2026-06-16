@@ -24,6 +24,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.contains("/oauth2/") || path.contains("/login/oauth2/");
+    }
+
+    @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
@@ -42,7 +48,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             final String userEmail = jwtService.extractUsername(jwt);
 
-            // Only authenticate if not already set in SecurityContext
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
