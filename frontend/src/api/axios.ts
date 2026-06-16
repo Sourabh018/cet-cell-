@@ -1,19 +1,22 @@
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 
- const api = axios.create({
+const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ── Request interceptor — attach access token ──
+// ── Request interceptor — attach access token (skip auth routes) ──
 api.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isAuthRoute = config.url?.includes("/auth/");
+    if (!isAuthRoute) {
+      const token = useAuthStore.getState().accessToken;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -41,7 +44,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.log('[Axios Interceptor] caught:', error.response?.status, error.config?.url);
     const originalRequest = error.config;
 
     // Don't retry auth endpoints or already-retried requests
@@ -53,7 +55,6 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // If already refreshing, queue the request
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
