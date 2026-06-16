@@ -47,6 +47,16 @@ const styles = `
   }
   .rp-btn-primary:hover { background: #6259c9; }
 
+  /* ── Share button ── */
+  .rp-btn-share {
+    padding: 7px 16px; border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    background: #25D366; border: none; color: #fff;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.18s;
+  }
+  .rp-btn-share:hover { background: #1fb855; }
+
   /* ── Page ── */
   .rp-page {
     max-width: 900px; margin: 0 auto;
@@ -331,16 +341,12 @@ const styles = `
 
   /* ── MOBILE ── */
   @media (max-width: 600px) {
-    /* Nav */
     .rp-nav { padding: 0 16px; height: 52px; }
     .rp-brand { font-size: 16px; }
-    .rp-btn-ghost { display: none; } /* hide Dashboard btn on mobile */
+    .rp-btn-ghost { display: none; }
     .rp-btn-primary { padding: 6px 12px; font-size: 12px; }
-
-    /* Page */
+    .rp-btn-share { padding: 6px 12px; font-size: 12px; }
     .rp-page { padding: 16px 12px 60px; gap: 16px; }
-
-    /* Scorecard top: stack circle + info vertically */
     .rp-scorecard-top {
       padding: 20px 16px;
       flex-direction: row;
@@ -354,32 +360,20 @@ const styles = `
     .rp-score-final span { font-size: 26px; }
     .rp-score-verdict { font-size: 11px; padding: 3px 10px; margin-top: 6px; }
     .rp-score-info { min-width: 0; }
-
-    /* Stats: 2x2 grid */
     .rp-scorecard-stats { grid-template-columns: repeat(2, 1fr); }
     .rp-stat-cell { padding: 14px 12px; }
     .rp-stat-lbl { font-size: 10px; }
     .rp-stat-val { font-size: 18px; }
-
-    /* Topic breakdown */
     .rp-topic-card > div { padding: 14px 16px !important; }
-
-    /* Question review */
     .rp-q-head { padding: 12px 14px; gap: 8px; }
     .rp-topic-chip { font-size: 10px; padding: 2px 8px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .rp-q-body { padding: 14px; gap: 12px; }
     .rp-q-text { font-size: 14px; }
-
-    /* Options: single column on mobile */
     .rp-opts { grid-template-columns: 1fr; gap: 6px; }
     .rp-opt { padding: 10px 12px; gap: 10px; }
     .rp-opt-text { font-size: 13px; }
-
-    /* Explanation */
     .rp-explanation { padding: 12px 14px; }
     .rp-expl-text { font-size: 13px; }
-
-    /* Section headers */
     .rp-section-hd { font-size: 11px; }
   }
 
@@ -419,6 +413,152 @@ const formatTime = (seconds: number) => {
   return `${m}m ${s}s`;
 };
 
+const generateScoreCard = (
+  percentage: number,
+  finalScore: number,
+  maxScore: number,
+  correct: number,
+  wrong: number,
+  skipped: number,
+  timeTakenSeconds: number,
+  topicName: string
+): string => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext('2d')!;
+
+  // Background
+  ctx.fillStyle = '#0b0f1a';
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Grid pattern
+  ctx.strokeStyle = 'rgba(83,74,183,0.1)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < 1080; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke();
+  }
+  for (let y = 0; y < 1080; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
+  }
+
+  // Purple glow top-right
+  const glow = ctx.createRadialGradient(1080, 0, 0, 1080, 0, 600);
+  glow.addColorStop(0, 'rgba(83,74,183,0.25)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Top accent bar
+  ctx.fillStyle = '#534AB7';
+  ctx.fillRect(0, 0, 1080, 8);
+
+  // Brand
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 52px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('CET', 80, 110);
+  ctx.fillStyle = '#7F77DD';
+  ctx.fillText('_CELL', 80 + ctx.measureText('CET').width, 110);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '28px sans-serif';
+  ctx.fillText('MHT-CET Practice', 80, 150);
+
+  // Score circle
+  const cx = 540, cy = 420, r = 180;
+  const scoreColor = percentage >= 60 ? '#1D9E75' : percentage >= 40 ? '#EF9F27' : '#E24B4A';
+
+  // Circle bg
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = scoreColor.replace(')', ',0.1)').replace('rgb', 'rgba');
+  ctx.fill();
+
+  // Circle border
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -Math.PI / 2, (-Math.PI / 2) + (2 * Math.PI * percentage / 100));
+  ctx.strokeStyle = scoreColor;
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // Score text
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 96px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${percentage.toFixed(1)}%`, cx, cy + 20);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '28px sans-serif';
+  ctx.fillText('Score', cx, cy + 65);
+
+  // Final score
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px sans-serif';
+  ctx.fillText(`${finalScore.toFixed(2)} / ${maxScore} marks`, cx, cy + 120);
+
+  // Stats row
+  const stats = [
+    { label: 'Correct', value: String(correct), color: '#1D9E75' },
+    { label: 'Wrong', value: String(wrong), color: '#E24B4A' },
+    { label: 'Skipped', value: String(skipped), color: 'rgba(255,255,255,0.4)' },
+    { label: 'Time', value: formatTime(timeTakenSeconds), color: '#AFA9EC' },
+  ];
+
+  const statY = 700;
+  const statW = 220;
+  const startX = (1080 - statW * 4) / 2;
+
+  stats.forEach((s, i) => {
+    const sx = startX + i * statW + statW / 2;
+
+    // Card bg
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    roundRect(ctx, sx - statW / 2 + 8, statY - 50, statW - 16, 120, 12);
+    ctx.fill();
+
+    ctx.fillStyle = s.color;
+    ctx.font = 'bold 44px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.value, sx, statY + 16);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '22px sans-serif';
+    ctx.fillText(s.label, sx, statY + 48);
+  });
+
+  // Topic
+  ctx.fillStyle = 'rgba(175,169,236,0.7)';
+  ctx.font = '26px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(topicName, 540, 870);
+
+  // CTA
+  ctx.fillStyle = '#534AB7';
+  roundRect(ctx, 340, 910, 400, 70, 12);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 28px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Practice free at cetcell.in', 540, 953);
+
+  return canvas.toDataURL('image/png');
+};
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
 export default function ResultPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
@@ -435,6 +575,29 @@ export default function ResultPage() {
         .catch((err) => { setError(err.response?.data?.error || err.message); setLoading(false); });
     }
   }, [attemptId]);
+
+  const handleShare = () => {
+    if (!result) return;
+    const topicName = result.topicScores?.[0]?.topicName ?? 'MHT-CET Practice';
+    const imgData = generateScoreCard(
+      result.percentage,
+      result.finalScore,
+      result.maxScore,
+      result.correct,
+      result.wrong,
+      result.skipped,
+      result.timeTakenSeconds,
+      topicName
+    );
+    const a = document.createElement('a');
+    a.href = imgData;
+    a.download = 'my-cet-score.png';
+    a.click();
+    const text = encodeURIComponent(
+      `I scored ${result.percentage.toFixed(1)}% in MHT-CET ${topicName} practice! 🎯\nPractice free: https://cetcell.in`
+    );
+    setTimeout(() => window.open(`https://wa.me/?text=${text}`, '_blank'), 300);
+  };
 
   if (loading) return (
     <>
@@ -478,6 +641,13 @@ export default function ResultPage() {
           <div className="rp-brand">CET<span>_</span>CELL</div>
           <div className="rp-nav-actions">
             <button className="rp-btn-ghost" onClick={() => navigate('/dashboard')}>Dashboard</button>
+            <button className="rp-btn-share" onClick={handleShare}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.127 17.579c-.264.738-1.305 1.388-2.14 1.57-.572.124-1.318.223-3.831-.823-3.299-1.376-5.43-4.7-5.594-4.918C6.4 13.2 5.2 11.6 5.2 9.933c0-1.655.867-2.468 1.174-2.8.272-.294.593-.368.791-.368l.57.01c.183.008.431-.069.675.516.252.603.855 2.084.93 2.237.074.152.124.331.025.53-.099.198-.149.32-.298.494-.149.174-.314.388-.447.521-.149.148-.304.309-.13.607.173.297.769 1.268 1.652 2.055 1.135 1.011 2.091 1.323 2.39 1.472.297.148.472.124.645-.074.173-.198.74-.866.937-1.163.198-.298.397-.248.67-.149.273.1 1.73.816 2.028.965.297.148.496.223.57.347.074.124.074.719-.173 1.412z"/>
+              </svg>
+              Share
+            </button>
             <button className="rp-btn-primary" onClick={() => navigate('/analytics')}>Analytics</button>
           </div>
         </nav>
@@ -489,7 +659,6 @@ export default function ResultPage() {
             <div className="rp-scorecard-grid" />
             <div className="rp-scorecard-inner">
               <div className="rp-scorecard-top">
-                {/* Circle */}
                 <div className="rp-score-circle" style={{
                   borderColor: theme.circle.border,
                   background: theme.circle.bg,
@@ -500,7 +669,6 @@ export default function ResultPage() {
                   <span className="rp-score-label" style={{ color: theme.circle.color }}>Score</span>
                 </div>
 
-                {/* Info */}
                 <div className="rp-score-info">
                   <div className="rp-score-final">
                     <span>{finalScore.toFixed(2)}</span> / {maxScore}
@@ -515,7 +683,6 @@ export default function ResultPage() {
                 </div>
               </div>
 
-              {/* Stats row */}
               <div className="rp-scorecard-stats">
                 <div className="rp-stat-cell">
                   <div className="rp-stat-lbl">Correct</div>
@@ -583,7 +750,6 @@ export default function ResultPage() {
 
                 return (
                   <div key={q.questionId} className={`rp-q-card ${statusKey}`}>
-                    {/* Head */}
                     <div className="rp-q-head">
                       <div className="rp-q-meta">
                         <div className="rp-q-num">{index + 1}</div>
@@ -592,7 +758,6 @@ export default function ResultPage() {
                       <span className={`rp-status-badge ${statusKey}`}>{statusLabel}</span>
                     </div>
 
-                    {/* Body */}
                     <div className="rp-q-body">
                       <p className="rp-q-text">{q.questionText}</p>
 
