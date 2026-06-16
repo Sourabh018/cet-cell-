@@ -195,6 +195,46 @@ export default function LoginPage() {
         }
         @keyframes lp-spin { to { transform: rotate(360deg); } }
 
+
+        .lp-google-btn {
+          width: 100%;
+          padding: 12px;
+          background: rgba(255,255,255,0.05);
+          border: 0.5px solid rgba(255,255,255,0.12);
+          border-radius: 10px;
+          color: rgba(255,255,255,0.8);
+          font-size: 14px;
+          font-weight: 500;
+          font-family: 'DM Sans', sans-serif;
+          cursor: pointer;
+          transition: background 0.2s, border-color 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 1rem;
+          text-decoration: none;
+        }
+        .lp-google-btn:hover {
+          background: rgba(255,255,255,0.09);
+          border-color: rgba(255,255,255,0.2);
+          color: #fff;
+        }
+        .lp-or-divider {
+          display: flex; align-items: center; gap: 12px;
+          margin-bottom: 1rem;
+        }
+        .lp-or-divider::before,
+        .lp-or-divider::after {
+          content: '';
+          flex: 1;
+          border-top: 0.5px solid rgba(255,255,255,0.08);
+        }
+        .lp-or-text {
+          font-size: 12px;
+          color: rgba(255,255,255,0.25);
+          white-space: nowrap;
+        }
         /* ── MOBILE ── */
         @media (max-width: 480px) {
           .lp-root { padding: 1.25rem 1rem; align-items: flex-start; padding-top: 2rem; }
@@ -230,6 +270,21 @@ export default function LoginPage() {
           <h1 className="lp-title">Welcome back</h1>
           <p className="lp-sub">Sign in to continue your preparation</p>
 
+
+          {/* Google Login */}
+          <a
+            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/oauth2/authorization/google`}
+            className="lp-google-btn"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18">
+              <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+              <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.8-2.7.8-2.08 0-3.84-1.4-4.47-3.29H1.85v2.07A8 8 0 0 0 8.98 17z"/>
+              <path fill="#FBBC05" d="M4.51 10.56A4.8 4.8 0 0 1 4.26 9c0-.54.1-1.06.25-1.56V5.37H1.85A8 8 0 0 0 .98 9c0 1.29.31 2.51.87 3.63l2.66-2.07z"/>
+              <path fill="#EA4335" d="M8.98 3.58c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 8.98 1a8 8 0 0 0-7.13 4.37l2.66 2.07c.63-1.89 2.39-3.29 4.47-3.29z"/>
+            </svg>
+            Continue with Google
+          </a>
+          <div className="lp-or-divider"><span className="lp-or-text">or sign in with email</span></div>
           {/* Error */}
           {error && (
             <div className="lp-error">

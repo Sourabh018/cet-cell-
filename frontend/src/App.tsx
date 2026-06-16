@@ -10,6 +10,7 @@ import ExamPage from "./pages/ExamPage";
 import ResultPage from "./pages/ResultPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OAuth2RedirectPage from "./pages/OAuth2RedirectPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ function App() {
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/oauth2/redirect" element={<OAuth2RedirectPage />} />
 
           {/* Protected routes */}
           <Route
