@@ -540,7 +540,7 @@ const generateScoreCard = (
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 28px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Practice free at cetcell.in', 540, 953);
+  ctx.fillText('Practice free at cet-cell.vercel.app', 540, 953);
 
   return canvas.toDataURL('image/png');
 };
@@ -594,7 +594,7 @@ export default function ResultPage() {
     a.download = 'my-cet-score.png';
     a.click();
     const text = encodeURIComponent(
-      `I scored ${result.percentage.toFixed(1)}% in MHT-CET ${topicName} practice! 🎯\nPractice free: https://cetcell.in`
+      `I scored ${result.percentage.toFixed(1)}% in MHT-CET ${topicName} practice! 🎯\nPractice free: https://cet-cell.vercel.app`
     );
     setTimeout(() => window.open(`https://wa.me/?text=${text}`, '_blank'), 300);
   };
