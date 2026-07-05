@@ -365,6 +365,8 @@ const styles = `
     .rp-stat-lbl { font-size: 10px; }
     .rp-stat-val { font-size: 18px; }
     .rp-topic-card > div { padding: 14px 16px !important; }
+    .rp-table th, .rp-table td { padding: 10px 12px; font-size: 12px; }
+    .rp-table th:first-child, .rp-table td:first-child { min-width: 110px; }
     .rp-q-head { padding: 12px 14px; gap: 8px; }
     .rp-topic-chip { font-size: 10px; padding: 2px 8px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .rp-q-body { padding: 14px; gap: 12px; }
@@ -704,33 +706,51 @@ export default function ResultPage() {
             </div>
           </div>
 
-          {/* ── Topic Accuracy ── */}
+          {/* ── Topic / Concept Breakdown (Table) ── */}
           <div>
-            <div className="rp-section-hd">Topic Breakdown</div>
+            <div className="rp-section-hd">Concept-wise Performance</div>
             <div className="rp-topic-card">
-              <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {sortedTopics.map((t: TopicScoreDTO) => {
-                  const color = topicBarColor(t.accuracyPercentage);
-                  const tBadge = scoreTheme(t.accuracyPercentage).badge;
-                  return (
-                    <div key={t.topicId}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '13px', color: 'rgba(232,234,240,0.75)', fontWeight: 500 }}>{t.topicName}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>{t.correct}/{t.totalQuestions}</span>
-                          <span className="rp-acc-badge" style={{
-                            background: tBadge.bg,
-                            borderColor: tBadge.border,
-                            color: tBadge.color,
-                          }}>{t.accuracyPercentage.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                      <div className="rp-bar-track">
-                        <div className="rp-bar-fill" style={{ width: `${t.accuracyPercentage}%`, background: color }} />
-                      </div>
-                    </div>
-                  );
-                })}
+              <div style={{ overflowX: 'auto' }}>
+                <table className="rp-table">
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Questions</th>
+                      <th>Correct</th>
+                      <th>Wrong</th>
+                      <th>Skipped</th>
+                      <th style={{ minWidth: '160px' }}>Accuracy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedTopics.map((t: TopicScoreDTO) => {
+                      const color = topicBarColor(t.accuracyPercentage);
+                      const tBadge = scoreTheme(t.accuracyPercentage).badge;
+                      return (
+                        <tr key={t.topicId}>
+                          <td style={{ textAlign: 'left', color: '#e8eaf0', fontWeight: 500 }}>{t.topicName}</td>
+                          <td>{t.totalQuestions}</td>
+                          <td style={{ color: '#1D9E75' }}>{t.correct}</td>
+                          <td style={{ color: '#E24B4A' }}>{t.wrong}</td>
+                          <td style={{ color: 'rgba(255,255,255,0.4)' }}>{t.skipped}</td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div className="rp-bar-track" style={{ flex: 1 }}>
+                                <div className="rp-bar-fill" style={{ width: `${t.accuracyPercentage}%`, background: color }} />
+                              </div>
+                              <span className="rp-acc-badge" style={{
+                                background: tBadge.bg,
+                                borderColor: tBadge.border,
+                                color: tBadge.color,
+                                flexShrink: 0,
+                              }}>{t.accuracyPercentage.toFixed(0)}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
