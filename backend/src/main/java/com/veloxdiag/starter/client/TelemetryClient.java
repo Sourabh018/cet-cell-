@@ -4,20 +4,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.veloxdiag.starter.model.Telemetry;
+import com.veloxdiag.starter.properties.VeloxDiagProperties;
 
 public class TelemetryClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final VeloxDiagProperties properties;
 
-    private final String SERVER_URL =
-            "https://veloxdiag-server.onrender.com/api/telemetry";
+    public TelemetryClient(VeloxDiagProperties properties) {
+        this.properties = properties;
+    }
 
     public void sendTelemetry(Telemetry telemetry) {
 
         try {
+
             ResponseEntity<Telemetry> response =
                     restTemplate.postForEntity(
-                            SERVER_URL,
+                            properties.getServerUrl(),
                             telemetry,
                             Telemetry.class);
 
@@ -30,5 +34,4 @@ public class TelemetryClient {
                     + e.getMessage());
         }
     }
-
 }
