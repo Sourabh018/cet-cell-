@@ -11,6 +11,7 @@ interface ExamSummary {
   totalQuestions: number;
   status: string;
   attempt?: {
+    id?: string;
     score?: number;
     percentage?: number;
     startedAt?: string;
@@ -35,7 +36,6 @@ interface AnalyticsDTO {
   history: { examId: string; resultId: string; examTitle: string; percentage: number; date: string }[];
 }
 
-// Set to actual CET date when declared (e.g. "2026-12-01"), or null to hide
 const CET_DATE: string | null = "2026-12-15";
 
 function useCETCountdown(targetDate: string | null) {
@@ -131,7 +131,6 @@ export default function DashboardPage() {
 
         .db-root { min-height: 100vh; background: #0b0f1a; font-family: 'DM Sans', sans-serif; color: #fff; }
 
-        /* ── NAV ── */
         .db-nav {
           background: #111520;
           border-bottom: 0.5px solid rgba(255,255,255,0.07);
@@ -146,20 +145,13 @@ export default function DashboardPage() {
         }
         .db-nav-brand { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: #fff; }
         .db-nav-brand span { color: #7F77DD; }
-
-        /* desktop nav right */
-        .db-nav-right {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
+        .db-nav-right { display: flex; align-items: center; gap: 12px; }
         .db-nav-name { font-size: 13px; color: rgba(255,255,255,0.5); }
         .db-nav-avatar {
           width: 30px; height: 30px; border-radius: 50%;
           background: #534AB7;
           display: flex; align-items: center; justify-content: center;
-          font-size: 11px; font-weight: 600; color: #fff;
-          flex-shrink: 0;
+          font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0;
         }
         .db-nav-signout {
           padding: 6px 14px; border-radius: 7px;
@@ -169,35 +161,23 @@ export default function DashboardPage() {
           transition: color 0.2s, border-color 0.2s; white-space: nowrap;
         }
         .db-nav-signout:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-
-        /* mobile hamburger */
         .db-hamburger {
-          display: none;
-          background: none; border: none;
-          cursor: pointer; padding: 4px;
-          flex-direction: column; gap: 5px;
+          display: none; background: none; border: none;
+          cursor: pointer; padding: 4px; flex-direction: column; gap: 5px;
         }
         .db-hamburger span {
           display: block; width: 22px; height: 2px;
           background: rgba(255,255,255,0.6); border-radius: 2px;
-          transition: background 0.2s;
         }
-
-        /* mobile dropdown menu */
         .db-mobile-menu {
-          display: none;
-          position: absolute; top: 56px; left: 0; right: 0;
-          background: #111520;
-          border-bottom: 0.5px solid rgba(255,255,255,0.07);
-          padding: 16px 20px;
-          flex-direction: column; gap: 12px;
-          z-index: 99;
+          display: none; position: absolute; top: 56px; left: 0; right: 0;
+          background: #111520; border-bottom: 0.5px solid rgba(255,255,255,0.07);
+          padding: 16px 20px; flex-direction: column; gap: 12px; z-index: 99;
         }
         .db-mobile-menu.open { display: flex; }
         .db-mobile-user {
           display: flex; align-items: center; gap: 10px;
-          padding-bottom: 12px;
-          border-bottom: 0.5px solid rgba(255,255,255,0.07);
+          padding-bottom: 12px; border-bottom: 0.5px solid rgba(255,255,255,0.07);
         }
         .db-mobile-name { font-size: 14px; font-weight: 500; }
         .db-mobile-signout {
@@ -206,16 +186,11 @@ export default function DashboardPage() {
           cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: left;
         }
 
-        /* ── BODY ── */
         .db-body { padding: 20px 16px; max-width: 1200px; margin: 0 auto; }
 
-        /* ── COUNTDOWN ── */
         .db-countdown {
-          background: rgba(83,74,183,0.12);
-          border: 0.5px solid rgba(83,74,183,0.35);
-          border-radius: 10px;
-          padding: 10px 16px;
-          margin-bottom: 14px;
+          background: rgba(83,74,183,0.12); border: 0.5px solid rgba(83,74,183,0.35);
+          border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;
           display: flex; align-items: center; justify-content: space-between;
           flex-wrap: wrap; gap: 8px;
         }
@@ -225,13 +200,9 @@ export default function DashboardPage() {
         .db-countdown-num { font-size: 18px; }
         .db-countdown-unit { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
 
-        /* ── HERO ── */
         .db-hero {
-          background: #131825;
-          border: 0.5px solid rgba(83,74,183,0.3);
-          border-radius: 14px;
-          padding: 20px;
-          margin-bottom: 16px;
+          background: #131825; border: 0.5px solid rgba(83,74,183,0.3);
+          border-radius: 14px; padding: 20px; margin-bottom: 16px;
           position: relative; overflow: hidden;
         }
         .db-hero-grid {
@@ -243,8 +214,7 @@ export default function DashboardPage() {
         }
         .db-hero-inner {
           position: relative; z-index: 1;
-          display: flex; align-items: flex-start; justify-content: space-between;
-          gap: 16px;
+          display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
         }
         .db-hero-text { flex: 1; min-width: 0; }
         .db-hero-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
@@ -262,51 +232,33 @@ export default function DashboardPage() {
           padding: 8px 16px; border-radius: 8px; border: none;
           background: #534AB7; color: #fff; font-size: 13px; font-weight: 600;
           cursor: pointer; font-family: 'DM Sans', sans-serif;
-          box-shadow: 0 4px 12px rgba(83,74,183,0.3); transition: background 0.2s;
-          white-space: nowrap;
+          box-shadow: 0 4px 12px rgba(83,74,183,0.3); transition: background 0.2s; white-space: nowrap;
         }
         .db-btn-primary:hover { background: #6158c9; }
         .db-streak { text-align: center; flex-shrink: 0; }
         .db-streak-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 700; color: #7F77DD; line-height: 1; }
         .db-streak-label { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; text-transform: uppercase; margin-top: 4px; }
 
-        /* ── STATS ── */
-        .db-stats {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 10px;
-          margin-bottom: 16px;
-        }
-        .db-stat {
-          background: #131825;
-          border: 0.5px solid rgba(255,255,255,0.07);
-          border-radius: 12px; padding: 14px 12px;
-        }
+        .db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .db-stat { background: #131825; border: 0.5px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px 12px; }
         .db-stat-label { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .db-stat-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; line-height: 1; }
         .db-stat-sub { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 4px; }
 
-        /* ── COLS ── */
         .db-cols { display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
-
         .db-section-title {
-          font-size: 10px; font-weight: 500;
-          color: rgba(255,255,255,0.35);
-          text-transform: uppercase; letter-spacing: 0.6px;
-          margin-bottom: 10px;
+          font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.35);
+          text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;
         }
 
-        /* ── EXAM CARDS ── */
         .db-exam-card {
-          background: #131825;
-          border: 0.5px solid rgba(255,255,255,0.07);
+          background: #131825; border: 0.5px solid rgba(255,255,255,0.07);
           border-radius: 12px; padding: 12px 14px;
           display: flex; align-items: center; justify-content: space-between;
-          margin-bottom: 8px; cursor: pointer;
-          transition: border-color 0.2s;
-          gap: 8px;
+          margin-bottom: 8px; transition: border-color 0.2s; gap: 8px;
         }
-        .db-exam-card:hover { border-color: rgba(83,74,183,0.5); }
+        .db-exam-card.clickable { cursor: pointer; }
+        .db-exam-card.clickable:hover { border-color: rgba(83,74,183,0.5); }
         .db-exam-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
         .db-exam-icon {
           width: 36px; height: 36px; border-radius: 9px;
@@ -325,7 +277,6 @@ export default function DashboardPage() {
           color: rgba(255,255,255,0.3); font-size: 13px;
         }
 
-        /* ── SIDEBAR ── */
         .db-sidebar-card {
           background: #131825; border: 0.5px solid rgba(255,255,255,0.07);
           border-radius: 12px; padding: 14px; margin-bottom: 14px;
@@ -338,7 +289,6 @@ export default function DashboardPage() {
         .db-bar-bg { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; }
         .db-bar { height: 4px; border-radius: 2px; }
 
-        /* ── QUICK ACTIONS ── */
         .db-quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .db-quick-btn {
           background: #131825; border: 0.5px solid rgba(255,255,255,0.07);
@@ -350,61 +300,37 @@ export default function DashboardPage() {
         .db-quick-icon { font-size: 20px; display: block; margin-bottom: 5px; }
         .db-quick-label { font-size: 11px; color: rgba(255,255,255,0.4); }
 
-        /* ── LOADING ── */
         .db-loading {
           display: flex; align-items: center; justify-content: center;
           min-height: 100vh; background: #0b0f1a;
           color: rgba(255,255,255,0.3); font-size: 14px;
         }
 
-        /* ══════════════════════════════════
-           MOBILE — ≤ 768px
-        ══════════════════════════════════ */
         @media (max-width: 768px) {
-          /* nav */
           .db-nav { padding: 0 16px; }
           .db-nav-right { display: none; }
           .db-hamburger { display: flex; }
-
-          /* body */
           .db-body { padding: 16px 12px; }
-
-          /* hero */
           .db-hero { padding: 16px; }
           .db-hero-title { font-size: 17px; }
           .db-hero-sub { font-size: 12px; margin-bottom: 12px; }
           .db-streak-num { font-size: 28px; }
-
-          /* stats — 2x2 grid */
           .db-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
           .db-stat { padding: 12px 10px; }
           .db-stat-val { font-size: 20px; }
-
-          /* weak topic stat — full name truncates; allow wrap */
           .db-stat-val.topic-name { font-size: 13px; padding-top: 2px; line-height: 1.3; }
-
-          /* cols — single column */
           .db-cols { grid-template-columns: 1fr; gap: 12px; }
-
-          /* exam cards */
           .db-exam-card { padding: 10px 12px; }
           .db-exam-icon { width: 32px; height: 32px; font-size: 15px; border-radius: 8px; }
           .db-exam-title { font-size: 13px; }
-
-          /* quick actions */
           .db-quick-grid { grid-template-columns: repeat(4, 1fr); }
           .db-quick-btn { padding: 10px 6px; }
           .db-quick-icon { font-size: 18px; margin-bottom: 4px; }
           .db-quick-label { font-size: 10px; }
-
-          /* countdown */
           .db-countdown { flex-direction: column; gap: 4px; }
           .db-countdown-time { font-size: 14px; }
         }
 
-        /* ══════════════════════════════════
-           SMALL MOBILE — ≤ 380px
-        ══════════════════════════════════ */
         @media (max-width: 380px) {
           .db-hero-btns { flex-direction: column; }
           .db-btn-ghost, .db-btn-primary { width: 100%; text-align: center; }
@@ -416,23 +342,16 @@ export default function DashboardPage() {
         <div className="db-loading">Loading…</div>
       ) : (
         <div className="db-root">
-          {/* ── NAV ── */}
           <nav className="db-nav" style={{ position: "relative" }}>
             <div className="db-nav-brand">CET<span>_CELL</span></div>
-
-            {/* Desktop */}
             <div className="db-nav-right">
               <span className="db-nav-name">{user?.name}</span>
               <div className="db-nav-avatar">{initials}</div>
               <button className="db-nav-signout" onClick={handleLogout}>Sign out</button>
             </div>
-
-            {/* Mobile hamburger */}
             <button className="db-hamburger" onClick={() => setMenuOpen((v) => !v)} aria-label="Menu">
               <span /><span /><span />
             </button>
-
-            {/* Mobile dropdown */}
             <div className={`db-mobile-menu${menuOpen ? " open" : ""}`}>
               <div className="db-mobile-user">
                 <div className="db-nav-avatar">{initials}</div>
@@ -443,7 +362,6 @@ export default function DashboardPage() {
           </nav>
 
           <div className="db-body">
-            {/* ── CET COUNTDOWN (shown only when CET_DATE is set) ── */}
             {countdown && (
               <div className="db-countdown">
                 <span className="db-countdown-label">MHT-CET countdown</span>
@@ -464,7 +382,6 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* ── HERO ── */}
             <div className="db-hero">
               <div className="db-hero-grid" />
               <div className="db-hero-inner">
@@ -487,7 +404,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* ── STATS ── */}
             <div className="db-stats">
               <div className="db-stat">
                 <div className="db-stat-label">Exams taken</div>
@@ -519,9 +435,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* ── MAIN COLS ── */}
             <div className="db-cols">
-              {/* Left — recent exams */}
               <div>
                 <div className="db-section-title">Recent exams</div>
                 {recentExams.length === 0 ? (
@@ -537,8 +451,13 @@ export default function DashboardPage() {
                     const scorePct = exam.attempt?.percentage != null
                       ? Math.round(exam.attempt.percentage)
                       : null;
+                    const attemptId = exam.attempt?.id;
                     return (
-                      <div key={exam.id} className="db-exam-card" onClick={() => navigate(`/exam/${exam.id}/result`)}>
+                      <div
+                        key={exam.id}
+                        className={`db-exam-card${attemptId ? " clickable" : ""}`}
+                        onClick={() => attemptId && navigate(`/result/${attemptId}`)}
+                      >
                         <div className="db-exam-left">
                           <div className="db-exam-icon" style={{ background: bg }}>
                             <span style={{ color }}>{icon}</span>
@@ -564,7 +483,6 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              {/* Right — weak topics + quick actions */}
               <div>
                 {topicBars.length > 0 && (
                   <>
