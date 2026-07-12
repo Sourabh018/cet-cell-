@@ -10,7 +10,7 @@ public class TelemetryClient {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private final String SERVER_URL =
-            "http://localhost:8081/api/telemetry";
+            "https://veloxdiag-server.onrender.com/api/telemetry";
 
     public void sendTelemetry(Telemetry telemetry) {
 
