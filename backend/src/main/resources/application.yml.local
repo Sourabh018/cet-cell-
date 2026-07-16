@@ -42,3 +42,10 @@ logging:
   level:
     com.examprep: DEBUG
     org.springframework.security: DEBUG
+
+veloxdiag:
+  enabled: true
+  application-name: CET_CELL
+  server-url: https://veloxdiag-server.onrender.com
+  excluded-paths:
+    - /actuator/health

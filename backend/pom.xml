@@ -109,6 +109,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- VeloxDiag telemetry starter -->
+        <dependency>
+            <groupId>com.veloxdiag</groupId>
+            <artifactId>veloxdiag-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>
