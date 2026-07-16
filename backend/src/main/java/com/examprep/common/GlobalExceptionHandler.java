@@ -15,6 +15,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Map<String, Object>> handleNullPointer(NullPointerException ex) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());

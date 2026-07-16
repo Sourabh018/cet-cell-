@@ -111,13 +111,16 @@ public class ExamService {
 
     @Transactional(readOnly = true)
     public List<ExamDTO> getMyExams(User user) {
-        return examRepository.findByStudentIdOrderByCreatedAtDesc(user.getId()).stream()
-                .map(exam -> {
-                    ExamAttempt attempt = examAttemptRepository.findByExamId(exam.getId());
-                    return mapToDTO(exam, attempt);
-                }).collect(Collectors.toList());
-    }
+        List<Exam> exams = examRepository.findByStudentIdWithDetails(user.getId());
 
+        List<UUID> examIds = exams.stream().map(Exam::getId).collect(Collectors.toList());
+        Map<UUID, ExamAttempt> attemptsByExamId = examAttemptRepository.findByExamIdIn(examIds).stream()
+                .collect(Collectors.toMap(a -> a.getExam().getId(), a -> a));
+
+        return exams.stream()
+                .map(exam -> mapToDTO(exam, attemptsByExamId.get(exam.getId())))
+                .collect(Collectors.toList());
+    }
     @Transactional
     public void startExam(UUID examId, User user) {
         Exam exam = examRepository.findById(examId)

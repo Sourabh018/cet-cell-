@@ -32,6 +32,7 @@ public class SecurityConfig {
                 // OAuth2 needs a session briefly during the redirect flow
                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
+            .anonymous(anon -> anon.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/**",
