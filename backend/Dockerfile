@@ -2,8 +2,9 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy pom.xml first to leverage Docker layer caching for dependencies
+# Copy pom.xml and local repo first to leverage Docker layer caching for dependencies
 COPY pom.xml .
+COPY libs ./libs
 RUN mvn dependency:go-offline -B
 
 # Copy source and build
