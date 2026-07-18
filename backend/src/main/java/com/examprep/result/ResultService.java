@@ -1,4 +1,4 @@
- package com.examprep.result;
+package com.examprep.result;
 
 import com.examprep.exam.*;
 import com.examprep.question.Question;
@@ -140,7 +140,17 @@ public class ResultService {
 
     @Transactional(readOnly = true)
     public AnalyticsDTO getAnalytics(User user) {
-        List<Result> results = resultRepository.findByStudentIdOrderByCreatedAtDesc(user.getId());
+        // Batched fetch #1: all results + their Exam, in one query (was: 1 query + N lazy-loads for r.getExam())
+        List<Result> results = resultRepository.findByStudentIdWithExam(user.getId());
+
+        if (!results.isEmpty()) {
+            // Batched fetch #2: TopicScores for all those results, in one more query
+            // (was: N lazy-loads, one per result, for r.getTopicScores())
+            List<UUID> resultIds = results.stream().map(Result::getId).collect(Collectors.toList());
+            resultRepository.findByIdInWithTopicScores(resultIds);
+            // Hibernate merges topicScores onto the already-managed `results` entities
+            // within this same transaction — no need to reassign the list.
+        }
 
         int totalExamsAttempted = results.size();
         double bestScorePercentage = results.stream().mapToDouble(Result::getPercentage).max().orElse(0.0);
