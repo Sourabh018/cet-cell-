@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.veloxdiag</groupId>
+  <artifactId>veloxdiag-starter</artifactId>
+  <versioning>
+    <lastUpdated>20260718044023</lastUpdated>
+    <snapshot>
+      <timestamp>20260718.044023</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>0.0.1-20260718.044023-1</value>
+        <updated>20260718044023</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>0.0.1-20260718.044023-1</value>
+        <updated>20260718044023</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>0.0.1-SNAPSHOT</version>
+</metadata>
