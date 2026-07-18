@@ -3,21 +3,21 @@
   <groupId>com.veloxdiag</groupId>
   <artifactId>veloxdiag-starter</artifactId>
   <versioning>
-    <lastUpdated>20260718150655</lastUpdated>
+    <lastUpdated>20260718160544</lastUpdated>
     <snapshot>
-      <timestamp>20260718.150655</timestamp>
-      <buildNumber>5</buildNumber>
+      <timestamp>20260718.160544</timestamp>
+      <buildNumber>6</buildNumber>
     </snapshot>
     <snapshotVersions>
       <snapshotVersion>
         <extension>jar</extension>
-        <value>0.0.1-20260718.150655-5</value>
-        <updated>20260718150655</updated>
+        <value>0.0.1-20260718.160544-6</value>
+        <updated>20260718160544</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>pom</extension>
-        <value>0.0.1-20260718.150655-5</value>
-        <updated>20260718150655</updated>
+        <value>0.0.1-20260718.160544-6</value>
+        <updated>20260718160544</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
