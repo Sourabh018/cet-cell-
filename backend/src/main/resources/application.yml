@@ -57,4 +57,4 @@ veloxdiag:
   server-url: https://veloxdiag-server.onrender.com
   api-key: ${VELOXDIAG_API_KEY}
   excluded-paths:
-    - /actuator/health
+    - /api/actuator/health
