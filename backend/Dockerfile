@@ -2,9 +2,15 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy pom.xml and local repo first to leverage Docker layer caching for dependencies
+ARG GITHUB_TOKEN
+ARG GITHUB_USERNAME=Sourabh018
+
+# Auth for GitHub Packages — settings.xml built at build-time, token from build arg
+RUN mkdir -p /root/.m2 && \
+    echo "<settings><servers><server><id>github</id><username>${GITHUB_USERNAME}</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > /root/.m2/settings.xml
+
+# Copy pom.xml first to leverage Docker layer caching for dependencies
 COPY pom.xml .
-COPY libs ./libs
 RUN mvn dependency:go-offline -B
 
 # Copy source and build
