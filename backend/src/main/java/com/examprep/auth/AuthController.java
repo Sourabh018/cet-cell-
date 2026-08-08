@@ -21,8 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) throws InterruptedException {
-        Thread.sleep(1500); // TEMPORARY — VeloxDiag PERFORMANCE_REGRESSION test, remove before presentation
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
