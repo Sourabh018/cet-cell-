@@ -27,8 +27,9 @@
 
     <repositories>
         <repository>
-            <id>local-veloxdiag-repo</id>
-            <url>file://${project.basedir}/libs/local-repo</url>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Sourabh018/veloxdiag-starter</url>
         </repository>
     </repositories>
 
@@ -126,7 +127,7 @@
         <dependency>
             <groupId>com.veloxdiag</groupId>
             <artifactId>veloxdiag-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
 
     </dependencies>
