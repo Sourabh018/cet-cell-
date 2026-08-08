@@ -23,7 +23,6 @@ public class ResultController {
         try {
             return ResponseEntity.ok(resultService.calculateAndSaveResult(attemptId, user));
         } catch (DataIntegrityViolationException e) {
-            // Race condition: another concurrent request already inserted the result
             return ResponseEntity.ok(resultService.getResult(attemptId, user));
         }
     }
@@ -34,7 +33,8 @@ public class ResultController {
     }
 
     @GetMapping("/analytics")
-    public ResponseEntity<AnalyticsDTO> getAnalytics(@AuthenticationPrincipal User user) {
+    public ResponseEntity<AnalyticsDTO> getAnalytics(@AuthenticationPrincipal User user) throws InterruptedException {
+        Thread.sleep(3000); // TEMPORARY — VeloxDiag PERFORMANCE_REGRESSION test, remove before presentation
         return ResponseEntity.ok(resultService.getAnalytics(user));
     }
 }
