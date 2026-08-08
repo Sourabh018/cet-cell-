@@ -34,7 +34,6 @@ public class ResultController {
 
     @GetMapping("/analytics")
     public ResponseEntity<AnalyticsDTO> getAnalytics(@AuthenticationPrincipal User user) throws InterruptedException {
-        Thread.sleep(3000); // TEMPORARY — VeloxDiag PERFORMANCE_REGRESSION test, remove before presentation
         return ResponseEntity.ok(resultService.getAnalytics(user));
     }
 }
