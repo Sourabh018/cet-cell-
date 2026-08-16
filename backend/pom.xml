@@ -27,9 +27,8 @@
 
     <repositories>
         <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/Sourabh018/veloxdiag-starter</url>
+             <id>jitpack.io</id>
+             <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -125,9 +124,9 @@
 
         <!-- VeloxDiag telemetry starter -->
         <dependency>
-            <groupId>com.veloxdiag</groupId>
+            <groupId>com.github.Sourabh018</groupId>
             <artifactId>veloxdiag-starter</artifactId>
-            <version>0.0.1</version>
+            <version>v0.0.2</version>
         </dependency>
 
     </dependencies>
