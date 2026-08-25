@@ -54,7 +54,7 @@ management:
 veloxdiag:
   enabled: true
   application-name: CET_CELL
-  server-url: https://veloxdiag-server-r9dm.onrender.com
+  server-url: https://veloxdiag-server-qxau.onrender.com
   api-key: ${VELOXDIAG_API_KEY}
   excluded-paths:
     - /api/actuator/health
