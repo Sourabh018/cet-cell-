@@ -128,7 +128,7 @@ public class ResultService {
 
     @Transactional(readOnly = true)
     public ResultDTO getResult(UUID attemptId, User user) {
-        Result result = resultRepository.findByAttemptId(attemptId)
+        Result result = resultRepository.findByAttemptIdWithDetails(attemptId)
                 .orElseThrow(() -> new RuntimeException("Result not found"));
 
         if (!result.getStudent().getId().equals(user.getId())) {
