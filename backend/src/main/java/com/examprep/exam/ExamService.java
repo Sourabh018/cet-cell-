@@ -5,6 +5,7 @@ import com.examprep.exam.dto.ExamDTO;
 import com.examprep.exam.dto.SaveProgressRequest;
 import com.examprep.question.Question;
 import com.examprep.question.QuestionRepository;
+import com.examprep.result.Result;
 import com.examprep.result.ResultRepository;
 import com.examprep.user.User;
 import lombok.RequiredArgsConstructor;
@@ -95,18 +96,21 @@ public class ExamService {
                 .build();
         examAttemptRepository.save(attempt);
 
-        return mapToDTO(exam, attempt);
+        return mapToDTO(exam, attempt, null);
     }
 
     @Transactional(readOnly = true)
     public ExamDTO getExam(UUID examId, User user) {
-        Exam exam = examRepository.findById(examId)
+        Exam exam = examRepository.findByIdWithDetails(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found"));
         if (!exam.getStudent().getId().equals(user.getId())) {
             throw new RuntimeException("Access denied");
         }
         ExamAttempt attempt = examAttemptRepository.findByExamId(examId);
-        return mapToDTO(exam, attempt);
+        Result result = (attempt != null && attempt.getStatus() == ExamStatus.SUBMITTED)
+                ? resultRepository.findByAttemptId(attempt.getId()).orElse(null)
+                : null;
+        return mapToDTO(exam, attempt, result);
     }
 
     @Transactional(readOnly = true)
@@ -117,8 +121,26 @@ public class ExamService {
         Map<UUID, ExamAttempt> attemptsByExamId = examAttemptRepository.findByExamIdIn(examIds).stream()
                 .collect(Collectors.toMap(a -> a.getExam().getId(), a -> a));
 
+        // Batched fetch: one query for every SUBMITTED exam's Result, instead
+        // of one resultRepository.findByAttemptId() call per exam inside the
+        // mapping loop below (see ResultRepository.findByAttemptIdIn — that
+        // per-exam call was the real N+1 here, separate from the exam/question
+        // side which findByStudentIdWithDetails already fetch-joins).
+        List<UUID> submittedAttemptIds = attemptsByExamId.values().stream()
+                .filter(a -> a.getStatus() == ExamStatus.SUBMITTED)
+                .map(ExamAttempt::getId)
+                .collect(Collectors.toList());
+        Map<UUID, Result> resultsByAttemptId = submittedAttemptIds.isEmpty()
+                ? Map.of()
+                : resultRepository.findByAttemptIdIn(submittedAttemptIds).stream()
+                        .collect(Collectors.toMap(r -> r.getAttempt().getId(), r -> r));
+
         return exams.stream()
-                .map(exam -> mapToDTO(exam, attemptsByExamId.get(exam.getId())))
+                .map(exam -> {
+                    ExamAttempt attempt = attemptsByExamId.get(exam.getId());
+                    Result result = attempt != null ? resultsByAttemptId.get(attempt.getId()) : null;
+                    return mapToDTO(exam, attempt, result);
+                })
                 .collect(Collectors.toList());
     }
     @Transactional
@@ -184,7 +206,7 @@ public class ExamService {
         examAttemptRepository.save(attempt);
     }
 
-    private ExamDTO mapToDTO(Exam exam, ExamAttempt attempt) {
+    private ExamDTO mapToDTO(Exam exam, ExamAttempt attempt, Result result) {
         List<ExamDTO.QuestionDTO> questionDTOs = exam.getExamQuestions().stream().map(eq -> {
             Question q = eq.getQuestion();
             Map<String, String> shuffled = eq.getShuffledOptions();
@@ -211,14 +233,13 @@ public class ExamService {
         if (attempt != null) {
             Double score = null;
             Double percentage = null;
-            if (attempt.getStatus() == ExamStatus.SUBMITTED) {
-                double[] scores = {0.0, 0.0};
-                resultRepository.findByAttemptId(attempt.getId()).ifPresent(r -> {
-                    scores[0] = r.getFinalScore();
-                    scores[1] = r.getPercentage();
-                });
-                score = scores[0];
-                percentage = scores[1];
+            // result is now pre-fetched by the caller (see getExam/getMyExams
+            // above) instead of queried here — this method used to call
+            // resultRepository.findByAttemptId() on every invocation, which
+            // was a real N+1 when mapToDTO ran once per exam in a list.
+            if (attempt.getStatus() == ExamStatus.SUBMITTED && result != null) {
+                score = result.getFinalScore();
+                percentage = result.getPercentage();
             }
 
             attemptDTO = ExamDTO.AttemptDTO.builder()
