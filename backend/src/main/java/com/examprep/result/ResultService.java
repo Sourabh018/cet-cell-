@@ -131,6 +131,12 @@ public class ResultService {
         Result result = resultRepository.findByAttemptIdWithDetails(attemptId)
                 .orElseThrow(() -> new RuntimeException("Result not found"));
 
+        // Second query, same transaction: attaches topicScores onto the same
+        // managed Result instance above via Hibernate's identity map — see
+        // ResultRepository.findByAttemptIdWithTopicScores javadoc for why this
+        // can't just be one JOIN FETCH query (MultipleBagFetchException).
+        resultRepository.findByAttemptIdWithTopicScores(attemptId);
+
         if (!result.getStudent().getId().equals(user.getId())) {
             throw new RuntimeException("Access denied");
         }
