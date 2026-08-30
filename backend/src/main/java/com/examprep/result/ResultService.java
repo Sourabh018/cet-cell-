@@ -23,12 +23,23 @@ public class ResultService {
 
     @Transactional
     public ResultDTO calculateAndSaveResult(UUID attemptId, User user) {
-        Optional<Result> existingResult = resultRepository.findByAttemptId(attemptId);
+        // findByAttemptIdWithDetails, not plain findByAttemptId — mapToDTO(...,
+        // includeReview=true) below iterates exam.getExamQuestions() and calls
+        // eq.getQuestion() per question (same loop shape as getResult()'s fix),
+        // so this early-return path needs the same fetch-joined query, not a
+        // second, independent N+1 site. Second call attaches topicScores via
+        // the identity map, matching the pattern used everywhere else in this
+        // class — see ResultRepository for why this can't be one query.
+        Optional<Result> existingResult = resultRepository.findByAttemptIdWithDetails(attemptId);
         if (existingResult.isPresent()) {
+            resultRepository.findByAttemptIdWithTopicScores(attemptId);
             return mapToDTO(existingResult.get(), true);
         }
 
-        ExamAttempt attempt = examAttemptRepository.findById(attemptId)
+        // findByIdWithExamDetails, not plain findById — see ExamAttemptRepository
+        // for why: the loop below touches eq.getQuestion() and q.getTopic() for
+        // every question, and plain findById() left both lazy-loaded per-iteration.
+        ExamAttempt attempt = examAttemptRepository.findByIdWithExamDetails(attemptId)
                 .orElseThrow(() -> new RuntimeException("Attempt not found"));
 
         if (!attempt.getStudent().getId().equals(user.getId())) {
