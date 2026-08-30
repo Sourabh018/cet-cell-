@@ -1,0 +1,11 @@
+-- Split out from V14 after V14 had already been applied to production —
+-- editing an already-applied migration breaks Flyway's checksum validation
+-- and hard-fails app startup (confirmed via a real Render deploy failure).
+-- Never edit a migration once it has run anywhere; add a new version instead.
+--
+-- This is the index actually behind the GET /api/exams/my Seq Scan
+-- investigation: ExamRepository.findByStudentIdWithDetails filters exams
+-- on student_id directly (WHERE e.student.id = :studentId), and no prior
+-- migration — including V14's four indexes on exam_attempts, results, and
+-- exam_questions — ever indexed this column on exams itself.
+CREATE INDEX idx_exams_student_id ON exams(student_id);
